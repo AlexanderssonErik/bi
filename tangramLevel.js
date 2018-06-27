@@ -7,16 +7,34 @@ let tangramLevel = {
   stage : 0,
   blockPixels : 0,
   projectionPixels : 0,
+  projectionPixelsSecond : [],
+  redPixel: [],   
+  greenPixel: [],  
+  bluePixel: [],
+
+  colorSelectorOnBase : function (){
+    if( this.level == 5 ){
+      return true;
+    }
+    return false;
+  },
+
+  colorNoMix: function(){
+    if( this.level == 5 ){
+      return true;
+    }
+    return false;
+  },
 
   noHints: function(){
-    if( this.level == 4 ){
+    if( this.level == 4 || this.level == 5 ){
       return true;
     }
     return false;
   },
 
   errorBlinkOnlyOnOutOfField : function (){
-    if( this.level == 2 || this.level == 3 ){
+    if( this.level == 2 || this.level == 3 || this.level == 5  ){
       return true;
     }
     return false;
@@ -25,7 +43,7 @@ let tangramLevel = {
   
 
   careColor: function(){
-    if(this.level == 2 || this.level == 3 || this.level == 4 ){
+    if(this.level == 2 || this.level == 3 || this.level == 4 || this.level == 5 ){
       return true;
     }
     return false;
@@ -99,6 +117,35 @@ let tangramLevel = {
       algoProjection.colorCavity(this.projectionPixels[2]);
     }
 
+    
+    if(this.colorNoMix()){
+
+
+      this.projectionPixelsSecond[0] = algoProjection.copy(this.projectionPixels[0]);
+      this.projectionPixelsSecond[1] = algoProjection.copy(this.projectionPixels[1]);
+
+      algoProjection.colorNoMix(this.projectionPixels[0], this.blockPixels, 0, false);
+      algoProjection.colorNoMix(this.projectionPixelsSecond[0], this.blockPixels, 0, true);
+      algoProjection.colorNoMix(this.projectionPixels[1], this.blockPixels, 1, false);
+      algoProjection.colorNoMix(this.projectionPixelsSecond[1], this.blockPixels, 0, true);
+      algoProjection.colorNoMix(this.projectionPixels[2], this.blockPixels, 2, true);
+
+    }
+
+    if(this.colorSelectorOnBase()){
+      basePlane.renderFlat([1.5, 0.5, 1.5], [0.5, 4.5, 8.5], [4,2,4], [2,6,2], [globalWorldColor.blue, globalWorldColor.green, globalWorldColor.red] );
+
+      base.ledSetLeft(globalWorldColor.red);
+      base.ledSetFront(globalWorldColor.green);
+      base.ledSetRight(globalWorldColor.blue);
+    }else {
+
+    base.ledSetLeft(globalWorldColor.cyan);
+          base.ledSetFront(0);
+          base.ledSetRight(globalWorldColor.magenta);
+          basePlane.renderFlat([]);
+    }
+
    /* for(let i = 0; i < this.blockPixels.length; i++){
       console.log("i: " + i + ", x " + this.blockPixels[i].x);
     }*/
@@ -110,6 +157,7 @@ let tangramLevel = {
       this.rowColumnCount[2] = 6;
       this.rowColumnCount[3] = 6;
       this.rowColumnCount[4] = 6;
+      this.rowColumnCount[5] = 6;
       //--
       /*
       0
@@ -159,7 +207,19 @@ let tangramLevel = {
       2.4  ~8 blocks
       2.5  ~all blocks
 
-      */
+     
+
+     5 
+     color selector on plane
+     don't mix colors
+    
+     5.0 one block
+     5.1 two block
+     5.2 four blocks 
+     5.3  ~8 blocks
+     5.4  ~all blocks
+
+     */
 
      
 
@@ -1368,6 +1428,41 @@ this.block[4][4] = this.block[0][4];
 
 //-------------------------
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+//5
+//--
+this.score[5] = [];
+this.block [5] = []; 
+
+//5.0
+//-------------------------
+this.score[5][0] = 0;
+this.block[5][0] = this.block[3][0];
+
+
+//5.1
+//-------------------------
+this.score[5][1] = 0;
+this.block[5][1] = this.block[3][1];
+
+//5.2
+//-------------------------
+this.score[5][2] = 0;
+this.block[5][2] = this.block[3][2];
+
+//5.3
+//-------------------------
+this.score[5][3] = 0;
+this.block[5][3] = this.block[3][3];
+
+//5.4
+//-------------------------
+this.score[5][4] = 0;
+this.block[5][4] = this.block[3][4];
+
+//-------------------------
+
 /*
       this.score[1] = [];
       this.score[1][0] = 0;
@@ -1410,6 +1505,62 @@ this.block[4][4] = this.block[0][4];
 
 
       */
+
+
+     let redBlock = [];
+      
+     redBlock[0] =  Object.create(block);
+     redBlock[0].x = 3;
+     redBlock[0].y = 0;
+     redBlock[0].z = 9;
+     redBlock[0].rotation = 2;
+     redBlock[0].twobytwo = false;
+     redBlock[0].ledALeft = globalWorldColor.red;
+     redBlock[0].ledARight = globalWorldColor.red;
+     redBlock[0].ledBLeft = globalWorldColor.red;
+     redBlock[0].ledBRight = globalWorldColor.red;
+     
+     this.redPixel =  algoBlockPixel.create(redBlock);
+     
+     
+     let greenBlock = [];
+     greenBlock[0] =  Object.create(block);
+     greenBlock[0].x = 1;
+     greenBlock[0].y = 0;
+     greenBlock[0].z = 4;
+     greenBlock[0].rotation = 3;
+     greenBlock[0].twobytwo = false;
+     greenBlock[0].ledALeft = globalWorldColor.green;
+     greenBlock[0].ledARight = globalWorldColor.green;
+     greenBlock[0].ledBLeft = globalWorldColor.green;
+     greenBlock[0].ledBRight = globalWorldColor.green;
+     greenBlock[1] =  Object.create(block);
+     greenBlock[1].x = 0;
+     greenBlock[1].y = 0;
+     greenBlock[1].z = 2;
+     greenBlock[1].rotation = 0;
+     greenBlock[1].twobytwo = true;
+     greenBlock[1].ledALeft = globalWorldColor.green;
+     greenBlock[1].ledARight = globalWorldColor.green;
+     greenBlock[1].ledBLeft = globalWorldColor.green;
+     greenBlock[1].ledBRight = globalWorldColor.green;
+     
+     this.greenPixel =  algoBlockPixel.create(greenBlock);
+     
+     let blueBlock = [];
+     
+     blueBlock[0] =  Object.create(block);
+     blueBlock[0].x = 3;
+     blueBlock[0].y = 0;
+     blueBlock[0].z = 1;
+     blueBlock[0].rotation = 2;
+     blueBlock[0].twobytwo = false;
+     blueBlock[0].ledALeft = globalWorldColor.blue;
+     blueBlock[0].ledARight = globalWorldColor.blue;
+     blueBlock[0].ledBLeft = globalWorldColor.blue;
+     blueBlock[0].ledBRight = globalWorldColor.blue;
+     
+     this.bluePixel =  algoBlockPixel.create(blueBlock);
      
       this.initLevel(this.block[0][0][0]);
 
